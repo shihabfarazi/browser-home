@@ -4556,8 +4556,12 @@ document
         () => {
             if (googleAccessToken) {
                 signOutOfGoogle();
+                return;
+            }
+            if (googleTokenClient) {
+                googleTokenClient.requestAccessToken({ prompt: 'consent' });
             } else {
-                signInWithGoogle();
+                showToast('Google auth is not ready yet');
             }
         }
     );
