@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -9,23 +8,7 @@
 
 <title>Home Screen</title>
 
-<!--
-=========================================================
-GOOGLE IDENTITY SERVICES
-=========================================================
-
-IMPORTANT:
-Replace YOUR_GOOGLE_CLIENT_ID with your OAuth 2.0
-Web Client ID from Google Cloud Console.
-
-Example:
-1234567890-abcdefg123.apps.googleusercontent.com
--->
-
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-
 <style>
-
 /* =========================================================
    ROOT / THEME
 ========================================================= */
@@ -44,7 +27,6 @@ Example:
 
     --accent: #007aff;
     --danger: #ff3b30;
-    --success: #34c759;
 
     --shadow:
         0 20px 60px rgba(31, 42, 68, .10);
@@ -113,12 +95,12 @@ body {
 }
 
 /* =========================================================
-   WALLPAPER
+   WALLPAPER LAYER
 ========================================================= */
 
 .wallpaper {
     position: fixed;
-    inset: -40px;
+    inset: 0;
     z-index: -20;
 
     background-position: center;
@@ -144,10 +126,23 @@ body {
     pointer-events: none;
 
     background:
-        rgba(0,0,0,.15);
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,.12),
+            rgba(255,255,255,.02)
+        );
 
     transition:
         background .4s ease;
+}
+
+html[data-theme="dark"] .wallpaper-overlay {
+    background:
+        linear-gradient(
+            180deg,
+            rgba(0,0,0,.35),
+            rgba(0,0,0,.20)
+        );
 }
 
 /* =========================================================
@@ -160,6 +155,7 @@ body {
     z-index: -10;
 
     overflow: hidden;
+
     pointer-events: none;
 
     background:
@@ -284,20 +280,24 @@ body {
 
 .brand {
     display: flex;
+
     align-items: center;
+
     gap: 12px;
 }
 
 .greeting {
     font-size: 17px;
+
     font-weight: 700;
+
     letter-spacing: -.025em;
 }
 
 .top-actions {
     display: flex;
+
     gap: 8px;
-    align-items: center;
 }
 
 /* =========================================================
@@ -367,154 +367,12 @@ body {
     width: 17px;
 }
 
-/* =========================================================
-   GOOGLE ACCOUNT / SYNC
-========================================================= */
-
-.google-account {
-    display: none;
-
-    align-items: center;
-
-    gap: 8px;
-
-    height: 42px;
-
-    padding:
-        0
-        7px
-        0
-        12px;
-
-    border:
-        1px solid
-        var(--glass-border);
-
-    border-radius: 14px;
-
-    background:
-        var(--glass);
-
-    backdrop-filter:
-        blur(25px);
-
-    -webkit-backdrop-filter:
-        blur(25px);
-}
-
-.google-account.visible {
-    display: flex;
-}
-
-.google-user {
-    display: flex;
-
-    align-items: center;
-
-    gap: 7px;
-
-    max-width: 150px;
-
-    font-size: 12px;
-
-    font-weight: 600;
-}
-
-.google-avatar {
-    width: 25px;
-    height: 25px;
-
-    border-radius: 50%;
-
-    object-fit: cover;
-}
-
-.google-signin-button {
-    display: flex;
-    align-items: center;
-}
-
-.google-signout {
-    width: 28px;
-    height: 28px;
-
-    border: none;
-
-    border-radius: 50%;
-
-    display: grid;
-    place-items: center;
-
-    background:
-        rgba(120,120,128,.15);
-
-    color:
-        var(--text);
-
-    cursor: pointer;
-
-    font-size: 16px;
-}
-
 .sync-status {
-    display: inline-flex;
-
-    align-items: center;
-
-    gap: 6px;
-
-    font-size: 11px;
-
-    color:
-        var(--secondary);
-
+    font-size: 12px;
+    color: var(--secondary);
+    margin-left: 12px;
     white-space: nowrap;
-}
-
-.sync-dot {
-    width: 7px;
-    height: 7px;
-
-    border-radius: 50%;
-
-    background:
-        var(--muted);
-
-    transition:
-        background .3s ease;
-}
-
-.sync-dot.synced {
-    background:
-        var(--success);
-}
-
-.sync-dot.syncing {
-    background:
-        var(--accent);
-
-    animation:
-        syncPulse 1s ease-in-out infinite;
-}
-
-.sync-dot.error {
-    background:
-        var(--danger);
-}
-
-@keyframes syncPulse {
-
-    0%,
-    100% {
-        opacity: .45;
-        transform: scale(.8);
-    }
-
-    50% {
-        opacity: 1;
-        transform: scale(1.15);
-    }
-
+    align-self: center;
 }
 
 /* =========================================================
@@ -638,8 +496,11 @@ body {
 
 .search-icon {
     width: 20px;
+
     margin-left: 17px;
-    color: var(--secondary);
+
+    color:
+        var(--secondary);
 }
 
 .search-input {
@@ -652,6 +513,7 @@ body {
         15px;
 
     border: none;
+
     outline: none;
 
     background: transparent;
@@ -666,7 +528,10 @@ body {
     color:
         var(--secondary);
 }
-
+.search-input:focus{
+    border:none;
+    outline:none;
+}
 .clear-search {
     width: 30px;
     height: 30px;
@@ -991,7 +856,7 @@ html[data-theme="dark"] .app-icon {
 }
 
 /* =========================================================
-   MODALS
+   MODALS / SHEETS
 ========================================================= */
 
 .modal-overlay {
@@ -1308,7 +1173,7 @@ html[data-theme="dark"] .app-icon {
 }
 
 /* =========================================================
-   RANGE
+   RANGE SLIDER
 ========================================================= */
 
 .range-row {
@@ -1536,19 +1401,8 @@ html[data-theme="dark"] .app-icon {
 
     .glass-button {
         width: 42px;
+
         padding: 0;
-    }
-
-    .google-account {
-        padding: 0 6px;
-    }
-
-    .google-user span {
-        display: none;
-    }
-
-    .sync-status {
-        display: none;
     }
 
     .modal-overlay {
@@ -1557,13 +1411,11 @@ html[data-theme="dark"] .app-icon {
 
     .modal {
         padding: 22px;
-        border-radius: 26px;
+
+        border-radius:
+            26px;
     }
 }
-
-/* =========================================================
-   TABLET
-========================================================= */
 
 @media (min-width: 701px) and (max-width: 1000px) {
 
@@ -1574,7 +1426,6 @@ html[data-theme="dark"] .app-icon {
                 1fr
             );
     }
-
 }
 
 /* =========================================================
@@ -1611,16 +1462,13 @@ input:focus-visible {
     }
 
 }
-
 </style>
-
 </head>
+
 
 <body>
 
-<!-- =========================================================
-     BACKGROUND
-========================================================= -->
+<!-- BACKGROUND -->
 
 <div
     id="wallpaper"
@@ -1631,694 +1479,660 @@ input:focus-visible {
 
 <div class="background"></div>
 
+
 <div class="app">
 
-<!-- =========================================================
-     TOP BAR
-========================================================= -->
+    <!-- TOP BAR -->
 
-<header class="topbar">
+    <header class="topbar">
 
-```
-<div class="brand">
+        <div class="brand">
 
-    <div
-        id="greeting"
-        class="greeting"
-    >
-        Hi, Shihab
-    </div>
+            <div
+                id="greeting"
+                class="greeting"
+            >
+                Hi, Shihab
+            </div>
 
-</div>
+            <div
+                id="syncStatus"
+                class="sync-status"
+            >
+                Syncing...
+            </div>
 
-
-<div class="top-actions">
-
-    <!-- GOOGLE SIGN IN -->
-
-    <div
-        id="googleSignInContainer"
-        class="google-signin-button"
-    ></div>
+        </div>
 
 
-    <!-- GOOGLE ACCOUNT -->
+        <div class="top-actions">
 
-    <div
-        id="googleAccount"
-        class="google-account"
-    >
-
-        <div class="google-user">
-
-            <img
-                id="googleAvatar"
-                class="google-avatar"
-                alt="Google account"
+            <button
+                class="glass-button"
+                id="editModeButton"
+                title="Edit Home Screen"
             >
 
-            <span id="googleUserName">
-                Google
+                <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <path d="M12 20h9"/>
+                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+                </svg>
+
+                <span>Edit</span>
+
+            </button>
+
+
+            <button
+                class="glass-button"
+                id="customizeButton"
+                title="Customize"
+            >
+
+                <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.42 1.42-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V21h-2v-.08a1.7 1.7 0 0 0-1.03-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-1.42-1.42.06-.06A1.7 1.7 0 0 0 9.4 15a1.7 1.7 0 0 0-1.56-1.03H7v-2h.84A1.7 1.7 0 0 0 9.4 10.94a1.7 1.7 0 0 0-.34-1.88L9 9l1.42-1.42.06.06a1.7 1.7 0 0 0 1.88.34A1.7 1.7 0 0 0 13.39 6.4V6h2v.4a1.7 1.7 0 0 0 1.03 1.58 1.7 1.7 0 0 0 1.88-.34l.06-.06L19.78 9l-.06.06a1.7 1.7 0 0 0-.34 1.88A1.7 1.7 0 0 0 20.94 12H21v2h-.06A1.7 1.7 0 0 0 19.4 15Z"/>
+                </svg>
+
+                <span>Customize</span>
+
+            </button>
+
+
+            <button
+                class="glass-button"
+                id="themeButton"
+                title="Theme"
+            >
+
+                <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <circle cx="12" cy="12" r="4"/>
+                    <path d="M12 2v2"/>
+                    <path d="M12 20v2"/>
+                    <path d="M4.93 4.93l1.41 1.41"/>
+                    <path d="M17.66 17.66l1.41 1.41"/>
+                    <path d="M2 12h2"/>
+                    <path d="M20 12h2"/>
+                </svg>
+
+                <span>Theme</span>
+
+            </button>
+
+            <button
+                class="glass-button"
+                id="syncSettingsButton"
+                title="Sync Settings"
+            >
+
+                <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <path d="M12 6v6l4 2"/>
+                    <path d="M4.93 4.93a10 10 0 0 1 14.14 0"/>
+                    <path d="M19.07 19.07a10 10 0 0 1-14.14 0"/>
+                </svg>
+
+                <span>Sync</span>
+
+            </button>
+
+
+            <button
+                class="glass-button"
+                id="addButton"
+                title="Add App"
+            >
+
+                <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <path d="M12 5v14"/>
+                    <path d="M5 12h14"/>
+                </svg>
+
+                <span>Add App</span>
+
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- CLOCK -->
+
+    <section class="clock-section">
+
+        <div class="clock">
+
+            <span id="clockTime">
+                12:00:00
+            </span>
+
+            <span
+                id="clockPeriod"
+                class="clock-period"
+            >
+                AM
             </span>
 
         </div>
 
         <div
-            id="syncStatus"
-            class="sync-status"
-        >
+            id="currentDate"
+            class="date"
+        ></div>
 
-            <span
-                id="syncDot"
-                class="sync-dot"
-            ></span>
+    </section>
 
-            <span id="syncText">
-                Local
-            </span>
+
+    <!-- SEARCH -->
+
+    <section class="search-area">
+
+        <div class="search-box">
+
+            <svg
+                class="search-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <circle cx="11" cy="11" r="8"/>
+                <path d="m21 21-4.3-4.3"/>
+            </svg>
+
+            <input
+                id="searchInput"
+                class="search-input"
+                type="search"
+                placeholder="Search"
+                autocomplete="off"
+                aria-label="Search apps"
+            >
+
+            <button
+                id="clearSearch"
+                class="clear-search"
+                aria-label="Clear search"
+            >
+                ×
+            </button>
 
         </div>
 
-        <button
-            id="googleSignOut"
-            class="google-signout"
-            title="Sign out"
-            aria-label="Sign out of Google"
+    </section>
+
+
+    <!-- APPS -->
+
+    <main>
+
+        <div
+            id="appGrid"
+            class="app-grid"
+        ></div>
+
+        <div
+            id="emptyState"
+            class="empty-state"
         >
-            ×
-        </button>
+            <strong>No Apps Found</strong>
+            <span>Try searching for something else.</span>
+        </div>
 
-    </div>
-
-
-    <!-- EDIT -->
-
-    <button
-        class="glass-button"
-        id="editModeButton"
-        title="Edit Home Screen"
-    >
-
-        <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-        >
-            <path d="M12 20h9"/>
-            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l1 4-4 1 1-4Z"/>
-        </svg>
-
-        <span>Edit</span>
-
-    </button>
-
-
-    <!-- CUSTOMIZE -->
-
-    <button
-        class="glass-button"
-        id="customizeButton"
-        title="Customize"
-    >
-
-        <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-        >
-            <circle cx="12" cy="12" r="3"/>
-            <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.42 1.42-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V21h-2v-.08a1.7 1.7 0 0 0-1.03-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-1.42-1.42.06-.06A1.7 1.7 0 0 0 9.4 15a1.7 1.7 0 0 0-1.56-1.03H7v-2h.84A1.7 1.7 0 0 0 9.4 10.94a1.7 1.7 0 0 0-.34-1.88L9 9l1.42-1.42.06.06a1.7 1.7 0 0 0 1.88.34A1.7 1.7 0 0 0 13.39 6.4V6h2v.4a1.7 1.7 0 0 0 1.03 1.58 1.7 1.7 0 0 0 1.88-.34l.06-.06L19.78 9l-.06.06a1.7 1.7 0 0 0-.34 1.88A1.7 1.7 0 0 0 20.94 12H21v2h-.06A1.7 1.7 0 0 0 19.4 15Z"/>
-        </svg>
-
-        <span>Customize</span>
-
-    </button>
-
-
-    <!-- THEME -->
-
-    <button
-        class="glass-button"
-        id="themeButton"
-        title="Theme"
-    >
-
-        <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-        >
-            <circle cx="12" cy="12" r="4"/>
-            <path d="M12 2v2"/>
-            <path d="M12 20v2"/>
-            <path d="M4.93 4.93l1.41 1.41"/>
-            <path d="M17.66 17.66l1.41 1.41"/>
-            <path d="M2 12h2"/>
-            <path d="M20 12h2"/>
-        </svg>
-
-        <span>Theme</span>
-
-    </button>
-
-
-    <!-- ADD -->
-
-    <button
-        class="glass-button"
-        id="addButton"
-        title="Add App"
-    >
-
-        <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-        >
-            <path d="M12 5v14"/>
-            <path d="M5 12h14"/>
-        </svg>
-
-        <span>Add App</span>
-
-    </button>
-
-</div>
-```
-
-</header>
-
-<!-- =========================================================
-     CLOCK
-========================================================= -->
-
-<section class="clock-section">
-
-```
-<div class="clock">
-
-    <span id="clockTime">
-        12:00:00
-    </span>
-
-    <span
-        id="clockPeriod"
-        class="clock-period"
-    >
-        AM
-    </span>
+    </main>
 
 </div>
 
-<div
-    id="currentDate"
-    class="date"
-></div>
-```
 
-</section>
-
-<!-- =========================================================
-     SEARCH
-========================================================= -->
-
-<section class="search-area">
-
-```
-<div class="search-box">
-
-    <svg
-        class="search-icon"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-    >
-        <circle cx="11" cy="11" r="8"/>
-        <path d="m21 21-4.3-4.3"/>
-    </svg>
-
-    <input
-        id="searchInput"
-        class="search-input"
-        type="search"
-        placeholder="Search"
-        autocomplete="off"
-        aria-label="Search apps"
-    >
-
-    <button
-        id="clearSearch"
-        class="clear-search"
-        aria-label="Clear search"
-    >
-        ×
-    </button>
-
-</div>
-```
-
-</section>
-
-<!-- =========================================================
-     APPS
-========================================================= -->
-
-<main>
-
-```
-<div
-    id="appGrid"
-    class="app-grid"
-></div>
-
-<div
-    id="emptyState"
-    class="empty-state"
->
-
-    <strong>No Apps Found</strong>
-
-    <span>
-        Try searching for something else.
-    </span>
-
-</div>
-```
-
-</main>
-
-</div>
-
-<!-- =========================================================
-     THEME MENU
-========================================================= -->
+<!-- THEME MENU -->
 
 <div
     id="themeMenu"
     class="theme-menu"
 >
 
-```
-<button
-    class="theme-option"
-    data-theme-choice="system"
->
-    System
-</button>
+    <button
+        class="theme-option"
+        data-theme-choice="system"
+    >
+        System
+    </button>
 
-<button
-    class="theme-option"
-    data-theme-choice="light"
->
-    Light
-</button>
+    <button
+        class="theme-option"
+        data-theme-choice="light"
+    >
+        Light
+    </button>
 
-<button
-    class="theme-option"
-    data-theme-choice="dark"
->
-    Dark
-</button>
-```
+    <button
+        class="theme-option"
+        data-theme-choice="dark"
+    >
+        Dark
+    </button>
 
 </div>
 
-<!-- =========================================================
-     ADD / EDIT APP MODAL
-========================================================= -->
+
+<!-- ADD / EDIT APP MODAL -->
 
 <div
     id="appModal"
     class="modal-overlay"
 >
 
-```
-<div class="modal">
+    <div class="modal">
 
-    <div class="modal-header">
+        <div class="modal-header">
 
-        <div
-            id="modalTitle"
-            class="modal-title"
-        >
-            Add App
-        </div>
-
-        <button
-            id="closeAppModal"
-            class="close-button"
-        >
-            ×
-        </button>
-
-    </div>
-
-
-    <div
-        id="iconPreview"
-        class="icon-preview"
-    >
-
-        <span
-            id="iconPreviewLetter"
-            class="icon-preview-letter"
-        >
-            A
-        </span>
-
-    </div>
-
-
-    <form id="bookmarkForm">
-
-        <div class="form-group">
-
-            <label class="form-label">
-                App Name
-            </label>
-
-            <input
-                id="nameInput"
-                class="form-input"
-                type="text"
-                placeholder="Google"
-                maxlength="40"
-                required
+            <div
+                id="modalTitle"
+                class="modal-title"
             >
+                Add App
+            </div>
 
-        </div>
-
-
-        <div class="form-group">
-
-            <label class="form-label">
-                Website URL
-            </label>
-
-            <input
-                id="urlInput"
-                class="form-input"
-                type="text"
-                placeholder="google.com"
-                required
+            <button
+                id="closeAppModal"
+                class="close-button"
             >
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label class="form-label">
-                Custom Icon URL
-                <span style="font-weight:400">
-                    (Optional)
-                </span>
-            </label>
-
-            <input
-                id="customIconInput"
-                class="form-input"
-                type="url"
-                placeholder="https://example.com/icon.png"
-            >
-
-            <small
-                style="
-                display:block;
-                margin-top:7px;
-                color:var(--secondary);
-                font-size:11px;
-                "
-            >
-                Custom icon first, automatic favicon second,
-                letter fallback last.
-            </small>
+                ×
+            </button>
 
         </div>
 
 
         <div
-            id="formError"
-            class="form-error"
-        ></div>
-
-
-        <div class="modal-actions">
-
-            <button
-                type="button"
-                id="cancelAppModal"
-                class="cancel-button"
+            id="iconPreview"
+            class="icon-preview"
+        >
+            <span
+                id="iconPreviewLetter"
+                class="icon-preview-letter"
             >
-                Cancel
-            </button>
-
-            <button
-                type="submit"
-                class="save-button"
-            >
-                Save
-            </button>
-
+                A
+            </span>
         </div>
 
-    </form>
+
+        <form id="bookmarkForm">
+
+            <div class="form-group">
+
+                <label class="form-label">
+                    App Name
+                </label>
+
+                <input
+                    id="nameInput"
+                    class="form-input"
+                    type="text"
+                    placeholder="Google"
+                    maxlength="40"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label class="form-label">
+                    Website URL
+                </label>
+
+                <input
+                    id="urlInput"
+                    class="form-input"
+                    type="text"
+                    placeholder="google.com"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label class="form-label">
+                    Custom Icon URL
+                    <span style="font-weight:400">
+                        (Optional)
+                    </span>
+                </label>
+
+                <input
+                    id="customIconInput"
+                    class="form-input"
+                    type="url"
+                    placeholder="https://example.com/icon.png"
+                >
+
+                <small
+                    style="
+                    display:block;
+                    margin-top:7px;
+                    color:var(--secondary);
+                    font-size:11px;
+                    "
+                >
+                    If provided, this icon will be used first.
+                    If it fails, the automatic favicon will be used.
+                </small>
+
+            </div>
+
+
+            <div
+                id="formError"
+                class="form-error"
+            ></div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    id="cancelAppModal"
+                    class="cancel-button"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="save-button"
+                >
+                    Save
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
 
 </div>
-```
 
-</div>
 
-<!-- =========================================================
-     CUSTOMIZE MODAL
-========================================================= -->
+<!-- CUSTOMIZE MODAL -->
 
 <div
     id="customizeModal"
     class="modal-overlay"
 >
 
-```
-<div class="modal">
+    <div class="modal">
 
-    <div class="modal-header">
+        <div class="modal-header">
 
-        <div class="modal-title">
-            Customize
+            <div class="modal-title">
+                Customize
+            </div>
+
+            <button
+                id="closeCustomizeModal"
+                class="close-button"
+            >
+                ×
+            </button>
+
         </div>
 
-        <button
-            id="closeCustomizeModal"
-            class="close-button"
-        >
-            ×
-        </button>
 
-    </div>
+        <!-- GREETING -->
 
+        <div class="form-group">
 
-    <div class="form-group">
-
-        <label class="form-label">
-            Greeting
-        </label>
-
-        <input
-            id="greetingInput"
-            class="form-input"
-            type="text"
-            maxlength="40"
-            placeholder="Hi, Shihab"
-        >
-
-    </div>
-
-
-    <div class="form-group">
-
-        <label class="form-label">
-            Wallpaper
-        </label>
-
-        <input
-            id="wallpaperFile"
-            class="file-input"
-            type="file"
-            accept="image/*"
-        >
-
-        <button
-            id="uploadWallpaperButton"
-            type="button"
-            class="upload-button"
-        >
-            Upload Wallpaper
-        </button>
-
-    </div>
-
-
-    <div class="form-group">
-
-        <label class="form-label">
-            Or use Wallpaper URL
-        </label>
-
-        <input
-            id="wallpaperUrl"
-            class="form-input"
-            type="url"
-            placeholder="https://example.com/wallpaper.jpg"
-        >
-
-    </div>
-
-
-    <div class="form-group">
-
-        <label class="form-label">
-            Wallpaper Blur
-        </label>
-
-        <div class="range-row">
+            <label class="form-label">
+                Greeting
+            </label>
 
             <input
-                id="blurSlider"
-                type="range"
-                min="0"
-                max="30"
-                step="1"
-                value="0"
+                id="greetingInput"
+                class="form-input"
+                type="text"
+                maxlength="40"
+                placeholder="Hi, Shihab"
             >
-
-            <span
-                id="blurValue"
-                class="range-value"
-            >
-                0px
-            </span>
 
         </div>
 
-    </div>
 
+        <!-- WALLPAPER UPLOAD -->
 
-    <div class="form-group">
+        <div class="form-group">
 
-        <label class="form-label">
-            Wallpaper Dim
-        </label>
-
-        <div class="range-row">
+            <label class="form-label">
+                Wallpaper
+            </label>
 
             <input
-                id="dimSlider"
-                type="range"
-                min="0"
-                max="70"
-                step="1"
-                value="15"
+                id="wallpaperFile"
+                class="file-input"
+                type="file"
+                accept="image/*"
             >
 
-            <span
-                id="dimValue"
-                class="range-value"
+            <button
+                id="uploadWallpaperButton"
+                type="button"
+                class="upload-button"
             >
-                15%
-            </span>
+                Upload Wallpaper
+            </button>
 
         </div>
 
-    </div>
+
+        <!-- WALLPAPER URL -->
+
+        <div class="form-group">
+
+            <label class="form-label">
+                Or use Wallpaper URL
+            </label>
+
+            <input
+                id="wallpaperUrl"
+                class="form-input"
+                type="url"
+                placeholder="https://example.com/wallpaper.jpg"
+            >
+
+        </div>
 
 
-    <div class="modal-actions">
+        <!-- BLUR -->
 
-        <button
-            id="removeWallpaperButton"
-            type="button"
-            class="cancel-button"
-        >
-            Remove Wallpaper
-        </button>
+        <div class="form-group">
 
-        <button
-            id="saveCustomizeButton"
-            type="button"
-            class="save-button"
-        >
-            Done
-        </button>
+            <label class="form-label">
+                Wallpaper Blur
+            </label>
+
+            <div class="range-row">
+
+                <input
+                    id="blurSlider"
+                    type="range"
+                    min="0"
+                    max="30"
+                    step="1"
+                    value="0"
+                >
+
+                <span
+                    id="blurValue"
+                    class="range-value"
+                >
+                    0px
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- DIM -->
+
+        <div class="form-group">
+
+            <label class="form-label">
+                Wallpaper Dim
+            </label>
+
+            <div class="range-row">
+
+                <input
+                    id="dimSlider"
+                    type="range"
+                    min="0"
+                    max="70"
+                    step="1"
+                    value="15"
+                >
+
+                <span
+                    id="dimValue"
+                    class="range-value"
+                >
+                    15%
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="modal-actions">
+
+            <button
+                id="removeWallpaperButton"
+                type="button"
+                class="cancel-button"
+            >
+                Remove Wallpaper
+            </button>
+
+            <button
+                id="saveCustomizeButton"
+                type="button"
+                class="save-button"
+            >
+                Done
+            </button>
+
+        </div>
 
     </div>
 
 </div>
-```
 
+
+<!-- SYNC SETTINGS MODAL -->
+<div
+    id="syncSettingsModal"
+    class="modal-overlay"
+>
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title">
+                Sync Settings
+            </div>
+            <button
+                id="closeGistSettingsModal"
+                class="close-button"
+            >
+                ×
+            </button>
+        </div>
+
+        <form id="gistSettingsForm">
+            <div class="form-group">
+                <label class="form-label">
+                    Gist ID or URL
+                </label>
+                <input
+                    id="gistIdInput"
+                    class="form-input"
+                    type="text"
+                    placeholder="72c69e450fc6e162376475d55176565f"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    Personal Access Token
+                </label>
+                <input
+                    id="gistTokenInput"
+                    class="form-input"
+                    type="password"
+                    placeholder="ghp_..."
+                    required
+                >
+            </div>
+
+            <div
+                id="gistModalError"
+                class="form-error"
+            ></div>
+
+            <div class="modal-actions">
+                <button
+                    id="clearGistCredentialsButton"
+                    type="button"
+                    class="cancel-button"
+                >
+                    Clear Credentials
+                </button>
+                <button
+                    type="submit"
+                    class="save-button"
+                >
+                    Save Credentials
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
+
 
 <div
     id="toast"
     class="toast"
 ></div>
 
+
 <script>
-
-/* =========================================================
-   GOOGLE CLOUD CONFIGURATION
-========================================================= */
-
-/*
-=========================================================
-IMPORTANT
-=========================================================
-
-1. Create a Google Cloud Project.
-
-2. Enable:
-   Google Drive API
-
-3. Create:
-   OAuth 2.0 Client ID
-   Application type: Web application
-
-4. Add your website origin under:
-   Authorized JavaScript origins
-
-5. Replace the value below.
-
-Example:
-
-const GOOGLE_CLIENT_ID =
-    "1234567890-abc123.apps.googleusercontent.com";
-
-=========================================================
-*/
-
-const GOOGLE_CLIENT_ID =
-    "1086031257990-dln3ojvov8pejdahngpc2vioh5maho5j.apps.googleusercontent.com";
-
-
-/*
-The narrow appData scope means this app can access
-only its own private application data in Drive.
-
-Do NOT replace this with the full Drive scope unless
-you specifically need access to the user's normal Drive.
-*/
-
-const GOOGLE_DRIVE_SCOPE =
-    "https://www.googleapis.com/auth/drive.appdata";
-
-
-const DRIVE_FILE_NAME =
-    "bookmarks.json";
-
 
 /* =========================================================
    STORAGE KEYS
@@ -2338,6 +2152,177 @@ const DB_NAME =
 
 const DB_STORE =
     "wallpapers";
+
+const GIST_ID_KEY =
+    'gist_id';
+
+const GIST_TOKEN_KEY =
+    'gist_token';
+
+const BOOKMARKS_FILE =
+    'bookmarks.json';
+
+let gistSyncActive =
+    false;
+
+function normalizeGistId(
+    input
+) {
+    return input
+        .trim()
+        .split('/')
+        .filter(Boolean)
+        .pop() || "";
+}
+
+function getGistCredentials() {
+    const rawId =
+        localStorage.getItem(
+            GIST_ID_KEY
+        ) || "";
+
+    const gistId =
+        normalizeGistId(
+            rawId
+        );
+
+    const gistToken =
+        localStorage.getItem(
+            GIST_TOKEN_KEY
+        ) || "";
+
+    return {
+        rawId,
+        gistId,
+        gistToken,
+        enabled:
+            Boolean(gistId && gistToken),
+        apiUrl:
+            gistId
+                ? `https://api.github.com/gists/${gistId}`
+                : ""
+    };
+}
+
+function openGistSettingsModal(
+    message = ""
+) {
+    const creds =
+        getGistCredentials();
+
+    gistIdInput.value =
+        creds.rawId;
+
+    gistTokenInput.value =
+        creds.gistToken;
+
+    gistModalError.textContent =
+        message;
+
+    syncSettingsModal.classList.add(
+        "active"
+    );
+}
+
+function closeGistSettingsModal() {
+    syncSettingsModal.classList.remove(
+        "active"
+    );
+}
+
+function clearGistCredentials() {
+    localStorage.removeItem(
+        GIST_ID_KEY
+    );
+
+    localStorage.removeItem(
+        GIST_TOKEN_KEY
+    );
+
+    updateSyncStatus(
+        'Local storage only'
+    );
+
+    gistModalError.textContent =
+        "";
+
+    gistIdInput.value =
+        "";
+
+    gistTokenInput.value =
+        "";
+}
+
+function saveGistCredentials() {
+    const rawId =
+        gistIdInput.value.trim();
+
+    const gistToken =
+        gistTokenInput.value.trim();
+
+    const gistId =
+        normalizeGistId(rawId);
+
+    if (
+        !gistId ||
+        !gistToken
+    ) {
+        gistModalError.textContent =
+            "Please enter both Gist ID and token.";
+        return;
+    }
+
+    localStorage.setItem(
+        GIST_ID_KEY,
+        rawId
+    );
+
+    localStorage.setItem(
+        GIST_TOKEN_KEY,
+        gistToken
+    );
+
+    gistModalError.textContent =
+        "";
+    closeGistSettingsModal();
+    updateSyncStatus('Syncing...');
+    loadBookmarksFromGist();
+}
+
+function ensureGistCredentials() {
+    const creds =
+        getGistCredentials();
+
+    if (!creds.enabled) {
+        openGistSettingsModal(
+            'Enter your Gist ID and token to enable sync.'
+        );
+        return false;
+    }
+
+    return true;
+}
+
+function handleInvalidGistCredentials(
+    status
+) {
+    if (
+        status === 401 ||
+        status === 404
+    ) {
+        alert(
+            'Gist credentials may be invalid or the Gist cannot be found. Please update them.'
+        );
+
+        openGistSettingsModal(
+            'Invalid credentials or Gist not found.'
+        );
+
+        return true;
+    }
+
+    return false;
+}
 
 
 /* =========================================================
@@ -2423,32 +2408,6 @@ let settings =
 
 
 /* =========================================================
-   GOOGLE AUTH STATE
-========================================================= */
-
-let googleTokenClient =
-    null;
-
-let googleAccessToken =
-    null;
-
-let driveFileId =
-    null;
-
-let googleUser =
-    null;
-
-let isGoogleSignedIn =
-    false;
-
-let syncTimer =
-    null;
-
-let syncInProgress =
-    false;
-
-
-/* =========================================================
    DOM
 ========================================================= */
 
@@ -2527,39 +2486,34 @@ const greeting =
         "greeting"
     );
 
+const syncStatus =
+    document.getElementById(
+        "syncStatus"
+    );
+
 const toast =
     document.getElementById(
         "toast"
     );
 
-const googleAccount =
+const syncSettingsModal =
     document.getElementById(
-        "googleAccount"
+        "syncSettingsModal"
     );
 
-const googleAvatar =
+const gistIdInput =
     document.getElementById(
-        "googleAvatar"
+        "gistIdInput"
     );
 
-const googleUserName =
+const gistTokenInput =
     document.getElementById(
-        "googleUserName"
+        "gistTokenInput"
     );
 
-const googleSignInContainer =
+const gistModalError =
     document.getElementById(
-        "googleSignInContainer"
-    );
-
-const syncDot =
-    document.getElementById(
-        "syncDot"
-    );
-
-const syncText =
-    document.getElementById(
-        "syncText"
+        "gistModalError"
     );
 
 
@@ -2598,19 +2552,163 @@ function loadApps() {
 }
 
 
-function saveApps() {
+function saveApps(sync = true) {
 
     localStorage.setItem(
         APP_KEY,
         JSON.stringify(apps)
     );
 
+    if (sync) {
+        syncAppsToGist();
+    }
+
 }
 
+function updateSyncStatus(message) {
+    if (syncStatus) {
+        syncStatus.textContent =
+            message;
+    }
+}
 
-/* =========================================================
-   SETTINGS
-========================================================= */
+function handleGistError(error) {
+    console.error('Gist sync failed', error);
+    gistSyncActive = false;
+    updateSyncStatus('Local storage only');
+}
+
+async function loadBookmarksFromGist() {
+    const creds = getGistCredentials();
+
+    if (!creds.enabled) {
+        updateSyncStatus('Local storage only');
+        openGistSettingsModal(
+            'Enter your Gist ID and token to enable sync.'
+        );
+        return;
+    }
+
+    gistSyncActive = true;
+    updateSyncStatus('Syncing...');
+
+    try {
+        const response = await fetch(
+            creds.apiUrl,
+            {
+                headers: {
+                    Authorization:
+                        `Bearer ${creds.gistToken}`,
+                    Accept:
+                        'application/vnd.github.v3+json'
+                }
+            }
+        );
+
+        if (!response.ok) {
+            if (
+                handleInvalidGistCredentials(
+                    response.status
+                )
+            ) {
+                return;
+            }
+            throw new Error(
+                `Gist load failed: ${response.status}`
+            );
+        }
+
+        const data = await response.json();
+        const content =
+            data?.files?.[BOOKMARKS_FILE]?.content;
+
+        if (typeof content !== 'string') {
+            throw new Error('Missing bookmarks.json in gist');
+        }
+
+        let remoteApps = null;
+        try {
+            remoteApps = JSON.parse(content);
+        } catch (parseError) {
+            throw new Error('Corrupted gist bookmarks content');
+        }
+
+        if (Array.isArray(remoteApps)) {
+            apps = remoteApps;
+            saveApps(false);
+            renderApps();
+            updateSyncStatus('Synced');
+        } else {
+            throw new Error('Gist bookmarks content is not an array');
+        }
+    } catch (error) {
+        handleGistError(error);
+    } finally {
+        gistSyncActive = false;
+    }
+}
+
+async function syncAppsToGist() {
+    const creds = getGistCredentials();
+
+    if (!creds.enabled) {
+        updateSyncStatus('Local storage only');
+        return;
+    }
+
+    gistSyncActive = true;
+    updateSyncStatus('Syncing...');
+
+    try {
+        const payload = {
+            files: {
+                [BOOKMARKS_FILE]: {
+                    content: JSON.stringify(
+                        apps,
+                        null,
+                        2
+                    )
+                }
+            }
+        };
+
+        const response = await fetch(
+            creds.apiUrl,
+            {
+                method: 'PATCH',
+                headers: {
+                    Authorization:
+                        `Bearer ${creds.gistToken}`,
+                    Accept:
+                        'application/vnd.github.v3+json',
+                    'Content-Type':
+                        'application/json'
+                },
+                body: JSON.stringify(payload)
+            }
+        );
+
+        if (!response.ok) {
+            if (
+                handleInvalidGistCredentials(
+                    response.status
+                )
+            ) {
+                return;
+            }
+            throw new Error(
+                `Gist patch failed: ${response.status}`
+            );
+        }
+
+        updateSyncStatus('Synced');
+    } catch (error) {
+        handleGistError(error);
+    } finally {
+        gistSyncActive = false;
+    }
+}
+
 
 function loadSettings() {
 
@@ -2717,11 +2815,11 @@ function loadIcon(
 
 
     /*
-    Priority:
+      Priority:
 
-    1. Custom icon
-    2. Google favicon
-    3. Letter fallback
+      1. Custom icon
+      2. Google favicon
+      3. Letter fallback
     */
 
     if (
@@ -2917,7 +3015,7 @@ function renderApps() {
             );
 
 
-            /* CONTROLS */
+            /* Controls */
 
             const controls =
                 document.createElement(
@@ -2989,7 +3087,7 @@ function renderApps() {
             );
 
 
-            /* ICON */
+            /* Icon */
 
             const icon =
                 document.createElement(
@@ -3026,7 +3124,7 @@ function renderApps() {
             );
 
 
-            /* NAME */
+            /* Name */
 
             const name =
                 document.createElement(
@@ -3160,920 +3258,6 @@ setInterval(
     updateClock,
     1000
 );
-
-
-/* =========================================================
-   GOOGLE DRIVE SYNC STATUS
-========================================================= */
-
-function setSyncStatus(
-    status,
-    message
-) {
-
-    syncDot.className =
-        "sync-dot";
-
-
-    if (
-        status
-    ) {
-
-        syncDot.classList.add(
-            status
-        );
-
-    }
-
-
-    syncText.textContent =
-        message;
-
-}
-
-
-/* =========================================================
-   GOOGLE IDENTITY SERVICES
-========================================================= */
-
-function initializeGoogleAuth() {
-
-    if (
-        GOOGLE_CLIENT_ID ===
-        "YOUR_GOOGLE_CLIENT_ID"
-    ) {
-
-        console.warn(
-            "Google OAuth is not configured. Replace YOUR_GOOGLE_CLIENT_ID."
-        );
-
-        return;
-
-    }
-
-
-    if (
-        !window.google ||
-        !google.accounts ||
-        !google.accounts.oauth2
-    ) {
-
-        setTimeout(
-            initializeGoogleAuth,
-            500
-        );
-
-        return;
-
-    }
-
-
-    googleTokenClient =
-        google.accounts.oauth2.initTokenClient({
-
-            client_id:
-                GOOGLE_CLIENT_ID,
-
-            scope:
-                GOOGLE_DRIVE_SCOPE,
-
-            callback:
-                handleGoogleTokenResponse
-
-        });
-
-
-    google.accounts.id.initialize({
-
-        client_id:
-            GOOGLE_CLIENT_ID,
-
-        callback:
-            handleGoogleIdentityResponse
-
-    });
-
-
-    google.accounts.id.renderButton(
-
-        googleSignInContainer,
-
-        {
-
-            theme:
-                "outline",
-
-            size:
-                "medium",
-
-            type:
-                "standard",
-
-            text:
-                "signin_with",
-
-            shape:
-                "pill",
-
-            logo_alignment:
-                "left"
-
-        }
-
-    );
-
-}
-
-
-/*
-GIS One Tap / identity response.
-
-This response gives us basic profile information.
-Drive access itself is requested separately using
-the OAuth token client below.
-*/
-
-function handleGoogleIdentityResponse(
-    response
-) {
-
-    try {
-
-        const payload =
-            JSON.parse(
-                atob(
-                    response.credential
-                        .split(".")[1]
-                        .replace(
-                            /-/g,
-                            "+"
-                        )
-                        .replace(
-                            /_/g,
-                            "/"
-                        )
-                )
-            );
-
-
-        googleUser = {
-
-            name:
-                payload.name ||
-                "Google User",
-
-            picture:
-                payload.picture ||
-                "",
-
-            email:
-                payload.email ||
-                ""
-
-        };
-
-
-        updateGoogleAccountUI();
-
-    } catch {
-
-        console.warn(
-            "Could not read Google identity."
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   GOOGLE SIGN IN BUTTON
-========================================================= */
-
-googleSignInContainer.addEventListener(
-    "click",
-    () => {
-
-        if (
-            !googleTokenClient
-        ) {
-
-            showToast(
-                "Google sign-in is still loading."
-            );
-
-            return;
-
-        }
-
-
-        setSyncStatus(
-            "syncing",
-            "Signing in..."
-        );
-
-
-        googleTokenClient.requestAccessToken({
-
-            prompt:
-                "consent"
-
-        });
-
-    }
-);
-
-
-/* =========================================================
-   GOOGLE TOKEN RESPONSE
-========================================================= */
-
-async function handleGoogleTokenResponse(
-    response
-) {
-
-    if (
-        response.error
-    ) {
-
-        console.error(
-            response
-        );
-
-        setSyncStatus(
-            "error",
-            "Sign-in failed"
-        );
-
-        showToast(
-            "Google sign-in failed."
-        );
-
-        return;
-
-    }
-
-
-    googleAccessToken =
-        response.access_token;
-
-    isGoogleSignedIn =
-        true;
-
-
-    googleSignInContainer.style.display =
-        "none";
-
-
-    googleAccount.classList.add(
-        "visible"
-    );
-
-
-    setSyncStatus(
-        "syncing",
-        "Syncing..."
-    );
-
-
-    try {
-
-        await loadBookmarksFromDrive();
-
-        showToast(
-            "Bookmarks synced with Google Drive"
-        );
-
-    } catch (
-        error
-    ) {
-
-        console.error(
-            "Drive sync error:",
-            error
-        );
-
-
-        setSyncStatus(
-            "error",
-            "Sync failed"
-        );
-
-
-        showToast(
-            "Could not sync with Google Drive."
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   UPDATE GOOGLE ACCOUNT UI
-========================================================= */
-
-function updateGoogleAccountUI() {
-
-    if (
-        !googleUser
-    ) {
-
-        return;
-
-    }
-
-
-    googleUserName.textContent =
-        googleUser.name;
-
-
-    if (
-        googleUser.picture
-    ) {
-
-        googleAvatar.src =
-            googleUser.picture;
-
-        googleAvatar.style.display =
-            "block";
-
-    }
-
-}
-
-
-/* =========================================================
-   DRIVE API REQUEST
-========================================================= */
-
-async function driveRequest(
-    url,
-    options = {}
-) {
-
-    if (
-        !googleAccessToken
-    ) {
-
-        throw new Error(
-            "Not signed in to Google."
-        );
-
-    }
-
-
-    const response =
-        await fetch(
-            url,
-            {
-
-                ...options,
-
-                headers: {
-
-                    "Authorization":
-                        `Bearer ${googleAccessToken}`,
-
-                    ...(options.headers || {})
-
-                }
-
-            }
-        );
-
-
-    if (
-        !response.ok
-    ) {
-
-        let message =
-            `Google Drive error ${response.status}`;
-
-        try {
-
-            const data =
-                await response.json();
-
-            message =
-                data.error?.message ||
-                message;
-
-        } catch {
-
-            /* Ignore JSON parsing errors. */
-
-        }
-
-
-        throw new Error(
-            message
-        );
-
-    }
-
-
-    return response;
-
-}
-
-
-/* =========================================================
-   FIND BOOKMARKS.JSON
-========================================================= */
-
-async function findBookmarksFile() {
-
-    const query =
-        encodeURIComponent(
-            `name='${DRIVE_FILE_NAME}' and trashed=false`
-        );
-
-
-    const url =
-        "https://www.googleapis.com/drive/v3/files" +
-        `?spaces=appDataFolder` +
-        `&q=${query}` +
-        `&pageSize=10` +
-        `&fields=files(id,name,mimeType,modifiedTime)`;
-
-
-    const response =
-        await driveRequest(
-            url
-        );
-
-
-    const data =
-        await response.json();
-
-
-    return (
-        data.files &&
-        data.files.length
-    )
-        ? data.files[0]
-        : null;
-
-}
-
-
-/* =========================================================
-   DOWNLOAD BOOKMARKS.JSON
-========================================================= */
-
-async function downloadBookmarksFile(
-    fileId
-) {
-
-    const response =
-        await driveRequest(
-            "https://www.googleapis.com/drive/v3/files/" +
-            encodeURIComponent(
-                fileId
-            ) +
-            "?alt=media"
-        );
-
-
-    return await response.json();
-
-}
-
-
-/* =========================================================
-   CREATE BOOKMARKS.JSON
-========================================================= */
-
-async function createBookmarksFile() {
-
-    const metadata =
-        {
-
-            name:
-                DRIVE_FILE_NAME,
-
-            parents:
-                [
-                    "appDataFolder"
-                ],
-
-            mimeType:
-                "application/json"
-
-        };
-
-
-    const content =
-        JSON.stringify(
-            apps,
-            null,
-            2
-        );
-
-
-    const boundary =
-        "-------iosHomeBoundary" +
-        Date.now();
-
-
-    const body =
-        [
-
-            `--${boundary}`,
-
-            "Content-Type: application/json; charset=UTF-8",
-
-            "",
-
-            JSON.stringify(
-                metadata
-            ),
-
-            `--${boundary}`,
-
-            "Content-Type: application/json",
-
-            "",
-
-            content,
-
-            `--${boundary}--`
-
-        ].join(
-            "\r\n"
-        );
-
-
-    const response =
-        await driveRequest(
-
-            "https://www.googleapis.com/upload/drive/v3/files" +
-            "?uploadType=multipart" +
-            "&fields=id,name",
-
-            {
-
-                method:
-                    "POST",
-
-                headers:
-                    {
-
-                        "Content-Type":
-                            `multipart/related; boundary=${boundary}`
-
-                    },
-
-                body
-
-            }
-
-        );
-
-
-    return await response.json();
-
-}
-
-
-/* =========================================================
-   UPDATE BOOKMARKS.JSON
-========================================================= */
-
-async function updateBookmarksFile() {
-
-    if (
-        !driveFileId
-    ) {
-
-        return;
-
-    }
-
-
-    const content =
-        JSON.stringify(
-            apps,
-            null,
-            2
-        );
-
-
-    const response =
-        await driveRequest(
-
-            "https://www.googleapis.com/upload/drive/v3/files/" +
-            encodeURIComponent(
-                driveFileId
-            ) +
-            "?uploadType=media",
-
-            {
-
-                method:
-                    "PATCH",
-
-                headers:
-                    {
-
-                        "Content-Type":
-                            "application/json"
-
-                    },
-
-                body:
-                    content
-
-            }
-
-        );
-
-
-    return await response.json();
-
-}
-
-
-/* =========================================================
-   LOAD BOOKMARKS FROM GOOGLE DRIVE
-========================================================= */
-
-async function loadBookmarksFromDrive() {
-
-    setSyncStatus(
-        "syncing",
-        "Loading..."
-    );
-
-
-    const file =
-        await findBookmarksFile();
-
-
-    /*
-    No file exists yet.
-
-    Create one from the local bookmark collection.
-    */
-
-    if (
-        !file
-    ) {
-
-        const created =
-            await createBookmarksFile();
-
-
-        driveFileId =
-            created.id;
-
-
-        setSyncStatus(
-            "synced",
-            "Synced"
-        );
-
-        return;
-
-    }
-
-
-    driveFileId =
-        file.id;
-
-
-    const cloudApps =
-        await downloadBookmarksFile(
-            driveFileId
-        );
-
-
-    if (
-        Array.isArray(
-            cloudApps
-        )
-    ) {
-
-        apps =
-            cloudApps;
-
-        saveApps();
-
-        renderApps();
-
-    }
-
-
-    setSyncStatus(
-        "synced",
-        "Synced"
-    );
-
-}
-
-
-/* =========================================================
-   SAVE / SYNC BOOKMARKS
-========================================================= */
-
-async function syncBookmarksToDrive() {
-
-    if (
-        !isGoogleSignedIn ||
-        !googleAccessToken
-    ) {
-
-        return;
-
-    }
-
-
-    /*
-    Prevent multiple simultaneous writes.
-    */
-
-    if (
-        syncInProgress
-    ) {
-
-        clearTimeout(
-            syncTimer
-        );
-
-
-        syncTimer =
-            setTimeout(
-                syncBookmarksToDrive,
-                500
-            );
-
-        return;
-
-    }
-
-
-    syncInProgress =
-        true;
-
-
-    setSyncStatus(
-        "syncing",
-        "Saving..."
-    );
-
-
-    try {
-
-        /*
-        If there is no known file ID,
-        locate or create bookmarks.json.
-        */
-
-        if (
-            !driveFileId
-        ) {
-
-            const file =
-                await findBookmarksFile();
-
-
-            if (
-                file
-            ) {
-
-                driveFileId =
-                    file.id;
-
-            } else {
-
-                const created =
-                    await createBookmarksFile();
-
-
-                driveFileId =
-                    created.id;
-
-            }
-
-        }
-
-
-        await updateBookmarksFile();
-
-
-        setSyncStatus(
-            "synced",
-            "Synced"
-        );
-
-    } catch (
-        error
-    ) {
-
-        console.error(
-            "Could not sync bookmarks:",
-            error
-        );
-
-
-        setSyncStatus(
-            "error",
-            "Sync failed"
-        );
-
-
-        showToast(
-            "Saved locally, but Drive sync failed."
-        );
-
-    } finally {
-
-        syncInProgress =
-            false;
-
-    }
-
-}
-
-
-/*
-This function is called after every bookmark mutation.
-
-The local copy is always saved immediately.
-
-Drive synchronization happens afterward.
-*/
-
-function saveBookmarksAndSync() {
-
-    saveApps();
-
-    renderApps();
-
-    syncBookmarksToDrive();
-
-}
-
-
-/* =========================================================
-   GOOGLE SIGN OUT
-========================================================= */
-
-document
-    .getElementById(
-        "googleSignOut"
-    )
-    .addEventListener(
-        "click",
-        () => {
-
-            if (
-                googleAccessToken
-            ) {
-
-                google.accounts.oauth2.revoke(
-                    googleAccessToken,
-                    () => {}
-                );
-
-            }
-
-
-            googleAccessToken =
-                null;
-
-            driveFileId =
-                null;
-
-            googleUser =
-                null;
-
-            isGoogleSignedIn =
-                false;
-
-
-            googleAccount.classList.remove(
-                "visible"
-            );
-
-
-            googleSignInContainer.style.display =
-                "flex";
-
-
-            setSyncStatus(
-                "",
-                "Local"
-            );
-
-
-            showToast(
-                "Signed out of Google"
-            );
-
-        }
-    );
 
 
 /* =========================================================
@@ -4214,23 +3398,12 @@ function updateIconPreview() {
         img.src =
             custom;
 
-    } else if (
-        url
-    ) {
+    } else {
 
         img.src =
             getFavicon(
                 url
             );
-
-    } else {
-
-        iconPreview.innerHTML =
-            `<span class="icon-preview-letter">
-                ${name.charAt(0).toUpperCase()}
-            </span>`;
-
-        return;
 
     }
 
@@ -4418,7 +3591,9 @@ bookmarkForm.addEventListener(
         }
 
 
-        saveBookmarksAndSync();
+        saveApps();
+
+        renderApps();
 
         closeAppModal();
 
@@ -4468,7 +3643,9 @@ function deleteApp(
         );
 
 
-    saveBookmarksAndSync();
+    saveApps();
+
+    renderApps();
 
     showToast(
         "App removed"
@@ -5358,6 +4535,55 @@ document
     );
 
 
+document
+    .getElementById(
+        "syncSettingsButton"
+    )
+    .addEventListener(
+        "click",
+        () => {
+            openGistSettingsModal();
+        }
+    );
+
+
+document
+    .getElementById(
+        "closeGistSettingsModal"
+    )
+    .addEventListener(
+        "click",
+        () => {
+            closeGistSettingsModal();
+        }
+    );
+
+
+document
+    .getElementById(
+        "gistSettingsForm"
+    )
+    .addEventListener(
+        "submit",
+        event => {
+            event.preventDefault();
+            saveGistCredentials();
+        }
+    );
+
+
+document
+    .getElementById(
+        "clearGistCredentialsButton"
+    )
+    .addEventListener(
+        "click",
+        () => {
+            clearGistCredentials();
+        }
+    );
+
+
 /* =========================================================
    INITIALIZE WALLPAPER
 ========================================================= */
@@ -5369,14 +4595,17 @@ applyWallpaperStyle();
 
 loadSavedWallpaper();
 
+loadBookmarksFromGist();
+
 
 /* =========================================================
-   CLOSE MODALS
+   CLOSE MODALS ON BACKDROP
 ========================================================= */
 
 [
     appModal,
-    customizeModal
+    customizeModal,
+    syncSettingsModal
 ].forEach(
     modal => {
 
@@ -5525,26 +4754,6 @@ function showToast(
 ========================================================= */
 
 renderApps();
-
-
-/* =========================================================
-   INITIALIZE GOOGLE AUTH
-========================================================= */
-
-/*
-GIS is loaded asynchronously.
-
-Wait until the library is available.
-*/
-
-window.addEventListener(
-    "load",
-    () => {
-
-        initializeGoogleAuth();
-
-    }
-);
 
 </script>
 
