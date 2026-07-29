@@ -2084,6 +2084,7 @@ const DB_STORE =
 let googleTokenClient = null;
 let googleAccessToken = null;
 let googleDriveFileId = null;
+let googleSignedIn = false;
 
 
 /* =========================================================
@@ -2329,10 +2330,12 @@ async function initializeGoogleSync() {
                 if (
                     response.error === 'login_required' ||
                     response.error === 'consent_required' ||
-                    response.error === 'invalid_grant'
+                    response.error === 'invalid_grant' ||
+                    response.error === 'interaction_required'
                 ) {
                     setGoogleSignedIn(false);
                 }
+                googleAccessToken = null;
                 updateGoogleSignInButton();
                 showToast('Google sign in failed');
                 return;
@@ -2340,20 +2343,23 @@ async function initializeGoogleSync() {
 
             googleAccessToken = response.access_token;
             setGoogleSignedIn(true);
+            googleSignedIn = true;
             await loadBookmarksFromDrive();
             updateGoogleSignInButton();
             showToast('Google Drive sync enabled');
         }
     });
 
-    updateGoogleSignInButton();
-
     if (getGoogleSignedIn()) {
+        googleSignedIn = true;
+        updateGoogleSignInButton();
         try {
             googleTokenClient.requestAccessToken({ prompt: '' });
         } catch (error) {
             console.warn('Silent Google auth failed', error);
         }
+    } else {
+        updateGoogleSignInButton();
     }
 }
 
@@ -2361,7 +2367,7 @@ function updateGoogleSignInButton() {
     const button = document.getElementById('googleSignInButton');
     if (!button) return;
 
-    const signedIn = Boolean(googleAccessToken || getGoogleSignedIn());
+    const signedIn = Boolean(googleAccessToken || googleSignedIn);
 
     if (signedIn) {
         button.innerHTML = `
@@ -2394,6 +2400,7 @@ function signInWithGoogle() {
 
 function signOutOfGoogle() {
     setGoogleSignedIn(false);
+    googleSignedIn = false;
     googleAccessToken = null;
     googleDriveFileId = null;
     updateGoogleSignInButton();
@@ -2498,10 +2505,21 @@ async function syncBookmarksToDrive() {
             googleDriveFileId = fileInfo.id;
         }
     } catch (error) {
-        console.error(error);
+        console.error('Drive sync error:', error);
         showToast('Failed to save bookmarks to Drive');
     }
 }
+
+async function refreshDriveBookmarks() {
+    if (!googleAccessToken) return;
+    await loadBookmarksFromDrive();
+}
+
+window.addEventListener('focus', () => {
+    if (googleAccessToken) {
+        refreshDriveBookmarks();
+    }
+});
 
 
 function loadSettings() {
