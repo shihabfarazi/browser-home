@@ -7,6 +7,7 @@
 <meta name="color-scheme" content="light dark">
 
 <title>Home Screen</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <style>
 /* =========================================================
@@ -1559,6 +1560,27 @@ input:focus-visible {
 
             </button>
 
+            <button
+                class="glass-button"
+                id="googleSignInButton"
+                title="Sign in with Google"
+                aria-live="polite"
+            >
+
+                <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <path d="M12 4.24c1.76 0 3.16.82 4.13 1.95L20 5.5c-1.64-1.55-3.84-2.5-6.37-2.5C8.34 3 5.22 5.14 3.73 8.01l2.75 2.14c.8-2.12 2.82-3.9 5.52-3.9Z"/>
+                    <path d="M12 19.76c-1.76 0-3.16-.82-4.13-1.95L4 18.5c1.64 1.55 3.84 2.5 6.37 2.5 2.7 0 4.72-1.78 5.52-3.9l2.75 2.14C18.78 18.86 15.66 21 12 21Z"/>
+                </svg>
+
+                <span id="googleSignInLabel">Sign in</span>
+
+            </button>
+
 
             <button
                 class="glass-button"
@@ -2032,6 +2054,15 @@ input:focus-visible {
    STORAGE KEYS
 ========================================================= */
 
+const CLIENT_ID =
+    '1086031257990-dln3ojvov8pejdahngpc2vioh5maho5j.apps.googleusercontent.com';
+
+const SCOPE =
+    'https://www.googleapis.com/auth/drive.appdata';
+
+const DRIVE_FILE_NAME =
+    'bookmarks.json';
+
 const APP_KEY =
     "ios-home-apps-v4";
 
@@ -2046,6 +2077,10 @@ const DB_NAME =
 
 const DB_STORE =
     "wallpapers";
+
+let googleTokenClient = null;
+let googleAccessToken = null;
+let googleDriveFileId = null;
 
 
 /* =========================================================
@@ -2257,6 +2292,166 @@ function saveApps() {
         JSON.stringify(apps)
     );
 
+    if (googleAccessToken) {
+        syncBookmarksToDrive();
+    }
+
+}
+
+async function initializeGoogleSync() {
+    if (!window.google?.accounts?.oauth2) {
+        window.setTimeout(initializeGoogleSync, 200);
+        return;
+    }
+
+    googleTokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID,
+        scope: SCOPE,
+        callback: async response => {
+            if (response.error) {
+                showToast('Google sign in failed');
+                return;
+            }
+            googleAccessToken = response.access_token;
+            await loadBookmarksFromDrive();
+            updateGoogleSignInButton();
+            showToast('Google Drive sync enabled');
+        }
+    });
+
+    updateGoogleSignInButton();
+}
+
+function updateGoogleSignInButton() {
+    const signInLabel = document.getElementById('googleSignInLabel');
+    const button = document.getElementById('googleSignInButton');
+    if (!signInLabel || !button) return;
+
+    if (googleAccessToken) {
+        signInLabel.textContent = 'Signed in';
+        button.title = 'Sign out of Google';
+    } else {
+        signInLabel.textContent = 'Sign in';
+        button.title = 'Sign in with Google';
+    }
+}
+
+function signInWithGoogle() {
+    if (!googleTokenClient) {
+        showToast('Google auth is not ready yet');
+        return;
+    }
+    googleTokenClient.requestAccessToken({ prompt: 'consent' });
+}
+
+function signOutOfGoogle() {
+    googleAccessToken = null;
+    googleDriveFileId = null;
+    updateGoogleSignInButton();
+    showToast('Signed out of Google');
+}
+
+async function fetchDriveFileInfo() {
+    const query = encodeURIComponent(`name='${DRIVE_FILE_NAME}' and 'appDataFolder' in parents`);
+    const url = `https://www.googleapis.com/drive/v3/files?q=${query}&spaces=appDataFolder&fields=files(id,name)`;
+    const response = await fetch(url, {
+        headers: {
+            Authorization: `Bearer ${googleAccessToken}`
+        }
+    });
+    if (!response.ok) {
+        throw new Error('Unable to query Drive file');
+    }
+    const data = await response.json();
+    return data.files?.[0] || null;
+}
+
+async function createDriveBookmarksFile(payload) {
+    const metadata = {
+        name: DRIVE_FILE_NAME,
+        parents: ['appDataFolder']
+    };
+    const formData = new FormData();
+    formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+    formData.append('file', new Blob([payload], { type: 'application/json' }));
+    const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${googleAccessToken}`
+        },
+        body: formData
+    });
+    if (!response.ok) {
+        throw new Error('Unable to create Drive file');
+    }
+    return response.json();
+}
+
+async function updateDriveBookmarksFile(fileId, payload) {
+    const metadata = { name: DRIVE_FILE_NAME };
+    const formData = new FormData();
+    formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+    formData.append('file', new Blob([payload], { type: 'application/json' }));
+    const response = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=multipart`, {
+        method: 'PATCH',
+        headers: {
+            Authorization: `Bearer ${googleAccessToken}`
+        },
+        body: formData
+    });
+    if (!response.ok) {
+        throw new Error('Unable to update Drive file');
+    }
+    return response.json();
+}
+
+async function loadBookmarksFromDrive() {
+    if (!googleAccessToken) return;
+    try {
+        const fileInfo = await fetchDriveFileInfo();
+        if (!fileInfo) {
+            const payload = JSON.stringify(apps, null, 2);
+            const created = await createDriveBookmarksFile(payload);
+            googleDriveFileId = created.id;
+            return;
+        }
+        googleDriveFileId = fileInfo.id;
+        const response = await fetch(`https://www.googleapis.com/drive/v3/files/${fileInfo.id}?alt=media`, {
+            headers: {
+                Authorization: `Bearer ${googleAccessToken}`
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Unable to load Drive bookmarks');
+        }
+        const remoteApps = await response.json();
+        if (Array.isArray(remoteApps)) {
+            apps = remoteApps;
+            saveApps();
+            renderApps();
+        }
+    } catch (error) {
+        console.error(error);
+        showToast('Google Drive sync failed');
+    }
+}
+
+async function syncBookmarksToDrive() {
+    if (!googleAccessToken) return;
+    try {
+        const payload = JSON.stringify(apps, null, 2);
+        const fileInfo = googleDriveFileId ? { id: googleDriveFileId } : await fetchDriveFileInfo();
+        if (!fileInfo) {
+            const created = await createDriveBookmarksFile(payload);
+            googleDriveFileId = created.id;
+        } else {
+            await updateDriveBookmarksFile(fileInfo.id, payload);
+            googleDriveFileId = fileInfo.id;
+        }
+    } catch (error) {
+        console.error(error);
+        showToast('Failed to save bookmarks to Drive');
+    }
 }
 
 
@@ -4206,6 +4401,28 @@ window
 
         }
     );
+
+
+/* =========================================================
+   GOOGLE DRIVE SYNC
+========================================================= */
+
+document
+    .getElementById(
+        "googleSignInButton"
+    )
+    .addEventListener(
+        "click",
+        () => {
+            if (googleAccessToken) {
+                signOutOfGoogle();
+            } else {
+                signInWithGoogle();
+            }
+        }
+    );
+
+initializeGoogleSync();
 
 
 /* =========================================================
