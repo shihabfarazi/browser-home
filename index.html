@@ -2307,31 +2307,19 @@ async function initializeGoogleSync() {
     googleTokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
         scope: SCOPE,
-        include_granted_scopes: true,
         callback: async response => {
             if (response.error) {
-                const message = response.error_description || response.error || 'Google sign in failed';
-                console.error('Google sign in error:', message, response);
-                showToast(`Google sign in failed: ${message}`);
-                updateGoogleSignInButton();
+                showToast('Google sign in failed');
                 return;
             }
             googleAccessToken = response.access_token;
-            console.log('Google access token acquired');
             await loadBookmarksFromDrive();
             updateGoogleSignInButton();
             showToast('Google Drive sync enabled');
         }
     });
 
-    console.log('Google sync initialized');
     updateGoogleSignInButton();
-
-    try {
-        googleTokenClient.requestAccessToken({ prompt: '' });
-    } catch (error) {
-        console.warn('Silent Google auth not available yet', error);
-    }
 }
 
 function updateGoogleSignInButton() {
@@ -2350,12 +2338,9 @@ function updateGoogleSignInButton() {
 
 function signInWithGoogle() {
     if (!googleTokenClient) {
-        showToast('Google auth is not ready yet. Retrying...');
-        initializeGoogleSync();
-        window.setTimeout(signInWithGoogle, 400);
+        showToast('Google auth is not ready yet');
         return;
     }
-    console.log('Requesting Google access token');
     googleTokenClient.requestAccessToken({ prompt: 'consent' });
 }
 
@@ -2375,9 +2360,7 @@ async function fetchDriveFileInfo() {
         }
     });
     if (!response.ok) {
-        const text = await response.text();
-        console.error('Drive file info error', response.status, text);
-        throw new Error(`Unable to query Drive file: ${response.status} ${text}`);
+        throw new Error('Unable to query Drive file');
     }
     const data = await response.json();
     return data.files?.[0] || null;
@@ -2399,9 +2382,7 @@ async function createDriveBookmarksFile(payload) {
         body: formData
     });
     if (!response.ok) {
-        const text = await response.text();
-        console.error('Drive create file error', response.status, text);
-        throw new Error(`Unable to create Drive file: ${response.status} ${text}`);
+        throw new Error('Unable to create Drive file');
     }
     return response.json();
 }
@@ -2419,9 +2400,7 @@ async function updateDriveBookmarksFile(fileId, payload) {
         body: formData
     });
     if (!response.ok) {
-        const text = await response.text();
-        console.error('Drive update file error', response.status, text);
-        throw new Error(`Unable to update Drive file: ${response.status} ${text}`);
+        throw new Error('Unable to update Drive file');
     }
     return response.json();
 }
@@ -2452,12 +2431,7 @@ async function loadBookmarksFromDrive() {
             renderApps();
         }
     } catch (error) {
-        console.error('loadBookmarksFromDrive error', error);
-        if (error.message.includes('401') || error.message.includes('403')) {
-            signOutOfGoogle();
-            showToast('Google auth issue. Please sign in again.');
-            return;
-        }
+        console.error(error);
         showToast('Google Drive sync failed');
     }
 }
@@ -2465,20 +2439,17 @@ async function loadBookmarksFromDrive() {
 async function syncBookmarksToDrive() {
     if (!googleAccessToken) return;
     try {
-        console.log('Syncing bookmarks to Drive...');
         const payload = JSON.stringify(apps, null, 2);
         const fileInfo = googleDriveFileId ? { id: googleDriveFileId } : await fetchDriveFileInfo();
         if (!fileInfo) {
             const created = await createDriveBookmarksFile(payload);
             googleDriveFileId = created.id;
-            console.log('Created bookmarks.json in Drive', googleDriveFileId);
         } else {
             await updateDriveBookmarksFile(fileInfo.id, payload);
             googleDriveFileId = fileInfo.id;
-            console.log('Updated bookmarks.json in Drive', googleDriveFileId);
         }
     } catch (error) {
-        console.error('syncBookmarksToDrive error', error);
+        console.error(error);
         showToast('Failed to save bookmarks to Drive');
     }
 }
