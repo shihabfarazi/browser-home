@@ -1146,12 +1146,12 @@ html[data-theme="dark"] .app-icon {
     font-weight: 700;
 }
 
-/* =========================================================
-   FILE INPUT
-========================================================= */
-
-.file-input {
-    display: none;
+.color-swatch {
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.5);
+    box-shadow: 0 1px 4px rgba(0,0,0,.12);
 }
 
 .upload-button {
@@ -1796,18 +1796,66 @@ input:focus-visible {
             <div class="form-group">
 
                 <label class="form-label">
-                    Custom Icon URL
+                    Custom Icon URL or SVG
                     <span style="font-weight:400">
                         (Optional)
                     </span>
                 </label>
 
-                <input
+                <textarea
                     id="customIconInput"
                     class="form-input"
-                    type="url"
-                    placeholder="https://example.com/icon.png"
+                    placeholder="Paste SVG markup or icon URL"
+                    rows="4"
+                ></textarea>
+
+                <div
+                    style="
+                    display:flex;
+                    gap:10px;
+                    align-items:center;
+                    margin-top:10px;
+                    "
                 >
+                    <input
+                        id="iconColorInput"
+                        class="form-input color-input"
+                        type="color"
+                        value="#007aff"
+                        style="
+                            flex:0 0 56px;
+                            padding:0;
+                            height:50px;
+                            min-width:56px;
+                            border:none;
+                            border-radius:16px;
+                            box-shadow:0 6px 18px rgba(0,0,0,.08);
+                            cursor:pointer;
+                        "
+                    >
+
+                    <input
+                        id="iconColorHexInput"
+                        class="form-input"
+                        type="text"
+                        placeholder="#007aff"
+                        maxlength="7"
+                        style="flex:1;"
+                    >
+
+                    <button
+                        type="button"
+                        id="pasteSvgButton"
+                        class="glass-button"
+                        style="
+                            padding:0 12px;
+                            height:50px;
+                            font-size:13px;
+                        "
+                    >
+                        Paste SVG
+                    </button>
+                </div>
 
                 <small
                     style="
@@ -1817,8 +1865,7 @@ input:focus-visible {
                     font-size:11px;
                     "
                 >
-                    If provided, this icon will be used first.
-                    If it fails, the automatic favicon will be used.
+                    Paste raw SVG markup or enter an icon URL. Use the color picker to choose the icon background.
                 </small>
 
             </div>
@@ -2436,6 +2483,21 @@ const customIconInput =
         "customIconInput"
     );
 
+const iconColorInput =
+    document.getElementById(
+        "iconColorInput"
+    );
+
+const iconColorHexInput =
+    document.getElementById(
+        "iconColorHexInput"
+    );
+
+const pasteSvgButton =
+    document.getElementById(
+        "pasteSvgButton"
+    );
+
 const iconPreview =
     document.getElementById(
         "iconPreview"
@@ -2809,7 +2871,10 @@ const globeSvg =
     ) {
 
         img.src =
-            app.customIcon;
+            buildIconSrc(
+                app.customIcon,
+                app.iconColor || "#007aff"
+            );
 
         img.onerror =
             () => {
@@ -3037,7 +3102,7 @@ function renderApps() {
 
             /* Icon */
 
-            const icon =
+                    const icon =
                 document.createElement(
                     "div"
                 );
@@ -3224,6 +3289,15 @@ function openAddModal() {
 
     bookmarkForm.reset();
 
+    iconColorInput.value =
+        "#007aff";
+
+    iconColorHexInput.value =
+        iconColorInput.value;
+
+    customIconInput.value =
+        "";
+
     formError.textContent =
         "";
 
@@ -3257,6 +3331,12 @@ function openEditModal(
 
     customIconInput.value =
         app.customIcon || "";
+
+    iconColorInput.value =
+        app.iconColor || "#007aff";
+
+    iconColorHexInput.value =
+        iconColorInput.value;
 
     formError.textContent =
         "";
@@ -3316,1419 +3396,5 @@ document
    ICON PREVIEW
 ========================================================= */
 
-function updateIconPreview() {
-
-    const name =
-        nameInput.value.trim()
-        || "A";
-
-    const custom =
-        customIconInput.value.trim();
-
-    const url =
-        urlInput.value.trim();
-
-
-    iconPreview.innerHTML =
-        "";
-
-
-    const img =
-        document.createElement(
-            "img"
-        );
-
-
-    if (
-        custom
-    ) {
-
-        img.src =
-            custom;
-
-    } else {
-
-        img.src =
-            getFavicon(
-                url
-            );
-
-    }
-
-
-    img.onerror =
-        () => {
-
-            iconPreview.innerHTML =
-                `<span class="icon-preview-letter">
-                    ${name.charAt(0).toUpperCase()}
-                </span>`;
-
-        };
-
-
-    iconPreview.appendChild(
-        img
-    );
-
-}
-
-
-[
-    nameInput,
-    urlInput,
-    customIconInput
-].forEach(
-    input => {
-
-        input.addEventListener(
-            "input",
-            updateIconPreview
-        );
-
-    }
-);
-
-
-/* =========================================================
-   SAVE APP
-========================================================= */
-
-bookmarkForm.addEventListener(
-    "submit",
-    event => {
-
-        event.preventDefault();
-
-
-        const name =
-            nameInput.value.trim();
-
-
-        let url =
-            urlInput.value.trim();
-
-
-        const customIcon =
-            customIconInput.value.trim();
-
-
-        if (
-            !/^https?:\/\//i.test(
-                url
-            )
-        ) {
-
-            url =
-                "https://" +
-                url;
-
-        }
-
-
-        try {
-
-            const parsed =
-                new URL(
-                    url
-                );
-
-
-            if (
-                ![
-                    "http:",
-                    "https:"
-                ].includes(
-                    parsed.protocol
-                )
-            ) {
-
-                throw new Error();
-
-            }
-
-        } catch {
-
-            formError.textContent =
-                "Please enter a valid website URL.";
-
-            return;
-
-        }
-
-
-        if (
-            customIcon
-        ) {
-
-            try {
-
-                const parsedIcon =
-                    new URL(
-                        customIcon
-                    );
-
-
-                if (
-                    ![
-                        "http:",
-                        "https:"
-                    ].includes(
-                        parsedIcon.protocol
-                    )
-                ) {
-
-                    throw new Error();
-
-                }
-
-            } catch {
-
-                formError.textContent =
-                    "Please enter a valid custom icon URL.";
-
-                return;
-
-            }
-
-        }
-
-
-        if (
-            editingId
-        ) {
-
-            apps =
-                apps.map(
-                    app =>
-                        app.id === editingId
-                            ? {
-                                ...app,
-                                name,
-                                url,
-                                customIcon
-                            }
-                            : app
-                );
-
-
-            showToast(
-                "App updated"
-            );
-
-        } else {
-
-            apps.push({
-
-                id:
-                    crypto.randomUUID(),
-
-                name,
-
-                url,
-
-                customIcon
-
-            });
-
-
-            showToast(
-                "App added"
-            );
-
-        }
-
-
-        saveApps();
-
-        renderApps();
-
-        closeAppModal();
-
-    }
-);
-
-
-/* =========================================================
-   DELETE
-========================================================= */
-
-function deleteApp(
-    id
-) {
-
-    const app =
-        apps.find(
-            item =>
-                item.id === id
-        );
-
-
-    if (
-        !app
-    ) {
-
-        return;
-
-    }
-
-
-    if (
-        !confirm(
-            `Remove "${app.name}" from your Home Screen?`
-        )
-    ) {
-
-        return;
-
-    }
-
-
-    apps =
-        apps.filter(
-            item =>
-                item.id !== id
-        );
-
-
-    saveApps();
-
-    renderApps();
-
-    showToast(
-        "App removed"
-    );
-
-}
-
-
-/* =========================================================
-   SEARCH
-========================================================= */
-
-searchInput.addEventListener(
-    "input",
-    renderApps
-);
-
-
-searchInput.addEventListener(
-    "keydown",
-    event => {
-
-        if (
-            event.key === "Enter"
-        ) {
-
-            const query =
-                searchInput.value.trim();
-
-            if (
-                query
-            ) {
-
-                window.location.href =
-                    "https://www.google.com/search?q=" +
-                    encodeURIComponent(query);
-
-            }
-
-        }
-
-    }
-);
-
-
-clearSearch.addEventListener(
-    "click",
-    () => {
-
-        searchInput.value =
-            "";
-
-        renderApps();
-
-        searchInput.focus();
-
-    }
-);
-
-
-/* =========================================================
-   EDIT MODE
-========================================================= */
-
-function enableEditMode() {
-
-    editMode =
-        true;
-
-    appGrid.classList.add(
-        "edit-mode"
-    );
-
-}
-
-
-function disableEditMode() {
-
-    editMode =
-        false;
-
-    appGrid.classList.remove(
-        "edit-mode"
-    );
-
-}
-
-
-document.addEventListener(
-    "pointerdown",
-    event => {
-
-        if (
-            !editMode
-        ) {
-
-            return;
-
-        }
-
-        if (
-            event.target.closest(
-                ".app-item"
-            )
-        ) {
-
-            return;
-
-        }
-
-        disableEditMode();
-
-    }
-);
-
-
-/* =========================================================
-    THEME
-========================================================= */
-
-function systemTheme() {
-
-    return window.matchMedia(
-        "(prefers-color-scheme: dark)"
-    ).matches
-        ? "dark"
-        : "light";
-
-}
-
-
-function applyTheme(
-    preference
-) {
-
-    localStorage.setItem(
-        THEME_KEY,
-        preference
-    );
-
-
-    document.documentElement
-        .setAttribute(
-            "data-theme",
-            preference === "system"
-                ? systemTheme()
-                : preference
-        );
-
-
-    document
-        .querySelectorAll(
-            ".theme-option"
-        )
-        .forEach(
-            option => {
-
-                option.classList.toggle(
-                    "active",
-                    option.dataset.themeChoice ===
-                    preference
-                );
-
-            }
-        );
-
-}
-
-
-applyTheme(
-    localStorage.getItem(
-        THEME_KEY
-    ) || "system"
-);
-
-
-document
-    .getElementById(
-        "themeButton"
-    )
-    .addEventListener(
-        "click",
-        event => {
-
-            event.stopPropagation();
-
-            document
-                .getElementById(
-                    "themeMenu"
-                )
-                .classList.toggle(
-                    "open"
-                );
-
-        }
-    );
-
-
-document
-    .querySelectorAll(
-        ".theme-option"
-    )
-    .forEach(
-        option => {
-
-            option.addEventListener(
-                "click",
-                () => {
-
-                    applyTheme(
-                        option.dataset.themeChoice
-                    );
-
-                    document
-                        .getElementById(
-                            "themeMenu"
-                        )
-                        .classList.remove(
-                            "open"
-                        );
-
-                }
-            );
-
-        }
-    );
-
-
-/* =========================================================
-   INDEXEDDB WALLPAPER STORAGE
-========================================================= */
-
-function openDB() {
-
-    return new Promise(
-        (resolve, reject) => {
-
-            const request =
-                indexedDB.open(
-                    DB_NAME,
-                    1
-                );
-
-
-            request.onupgradeneeded =
-                () => {
-
-                    const db =
-                        request.result;
-
-
-                    if (
-                        !db.objectStoreNames
-                            .contains(
-                                DB_STORE
-                            )
-                    ) {
-
-                        db.createObjectStore(
-                            DB_STORE
-                        );
-
-                    }
-
-                };
-
-
-            request.onsuccess =
-                () =>
-                    resolve(
-                        request.result
-                    );
-
-
-            request.onerror =
-                () =>
-                    reject(
-                        request.error
-                    );
-
-        }
-    );
-
-}
-
-
-async function saveWallpaper(
-    blob
-) {
-
-    const db =
-        await openDB();
-
-
-    return new Promise(
-        (resolve, reject) => {
-
-            const transaction =
-                db.transaction(
-                    DB_STORE,
-                    "readwrite"
-                );
-
-
-            transaction.objectStore(
-                DB_STORE
-            ).put(
-                blob,
-                "wallpaper"
-            );
-
-
-            transaction.oncomplete =
-                resolve;
-
-
-            transaction.onerror =
-                () =>
-                    reject(
-                        transaction.error
-                    );
-
-        }
-    );
-
-}
-
-
-async function getWallpaper() {
-
-    try {
-
-        const db =
-            await openDB();
-
-
-        return new Promise(
-            resolve => {
-
-                const request =
-                    db.transaction(
-                        DB_STORE,
-                        "readonly"
-                    )
-                    .objectStore(
-                        DB_STORE
-                    )
-                    .get(
-                        "wallpaper"
-                    );
-
-
-                request.onsuccess =
-                    () =>
-                        resolve(
-                            request.result
-                        );
-
-
-                request.onerror =
-                    () =>
-                        resolve(
-                            null
-                        );
-
-            }
-        );
-
-    } catch {
-
-        return null;
-
-    }
-
-}
-
-
-async function deleteWallpaper() {
-
-    const db =
-        await openDB();
-
-
-    return new Promise(
-        resolve => {
-
-            const request =
-                db.transaction(
-                    DB_STORE,
-                    "readwrite"
-                )
-                .objectStore(
-                    DB_STORE
-                )
-                .delete(
-                    "wallpaper"
-                );
-
-
-            request.onsuccess =
-                resolve;
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   APPLY WALLPAPER
-========================================================= */
-
-function applyWallpaperStyle() {
-
-    wallpaper.style.filter =
-        `blur(${settings.blur}px)`;
-
-    wallpaper.style.transform =
-        settings.blur > 0
-            ? `scale(${1 + settings.blur / 100})`
-            : "scale(1)";
-
-
-    document
-        .querySelector(
-            ".wallpaper-overlay"
-        )
-        .style.background =
-        `rgba(0,0,0,${settings.dim / 100})`;
-
-}
-
-
-async function loadSavedWallpaper() {
-
-    const blob =
-        await getWallpaper();
-
-
-    if (
-        blob
-    ) {
-
-        const url =
-            URL.createObjectURL(
-                blob
-            );
-
-        wallpaper.style.backgroundImage =
-            `url("${url}")`;
-
-        wallpaper.classList.add(
-            "has-image"
-        );
-
-        return;
-
-    }
-
-
-    if (
-        settings.wallpaperUrl
-    ) {
-
-        wallpaper.style.backgroundImage =
-            `url("${settings.wallpaperUrl}")`;
-
-        wallpaper.classList.add(
-            "has-image"
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   CUSTOMIZE PANEL
-========================================================= */
-
-function openCustomize() {
-
-    document
-        .getElementById(
-            "greetingInput"
-        )
-        .value =
-        settings.greeting;
-
-
-    document
-        .getElementById(
-            "wallpaperUrl"
-        )
-        .value =
-        settings.wallpaperUrl;
-
-
-    document
-        .getElementById(
-            "blurSlider"
-        )
-        .value =
-        settings.blur;
-
-
-    document
-        .getElementById(
-            "dimSlider"
-        )
-        .value =
-        settings.dim;
-
-
-    updateSliderLabels();
-
-    customizeModal.classList.add(
-        "active"
-    );
-
-}
-
-
-document
-    .getElementById(
-        "customizeButton"
-    )
-    .addEventListener(
-        "click",
-        openCustomize
-    );
-
-
-document
-    .getElementById(
-        "closeCustomizeModal"
-    )
-    .addEventListener(
-        "click",
-        () =>
-            customizeModal.classList.remove(
-                "active"
-            )
-    );
-
-
-/* =========================================================
-   GREETING
-========================================================= */
-
-document
-    .getElementById(
-        "greetingInput"
-    )
-    .addEventListener(
-        "input",
-        event => {
-
-            greeting.textContent =
-                event.target.value;
-
-        }
-    );
-
-
-/* =========================================================
-   SLIDERS
-========================================================= */
-
-function updateSliderLabels() {
-
-    const blur =
-        Number(
-            document
-                .getElementById(
-                    "blurSlider"
-                )
-                .value
-        );
-
-
-    const dim =
-        Number(
-            document
-                .getElementById(
-                    "dimSlider"
-                )
-                .value
-        );
-
-
-    document
-        .getElementById(
-            "blurValue"
-        )
-        .textContent =
-        `${blur}px`;
-
-
-    document
-        .getElementById(
-            "dimValue"
-        )
-        .textContent =
-        `${dim}%`;
-
-
-    wallpaper.style.filter =
-        `blur(${blur}px)`;
-
-
-    wallpaper.style.transform =
-        blur > 0
-            ? `scale(${1 + blur / 100})`
-            : "scale(1)";
-
-
-    document
-        .querySelector(
-            ".wallpaper-overlay"
-        )
-        .style.background =
-        `rgba(0,0,0,${dim / 100})`;
-
-}
-
-
-document
-    .getElementById(
-        "blurSlider"
-    )
-    .addEventListener(
-        "input",
-        updateSliderLabels
-    );
-
-
-document
-    .getElementById(
-        "dimSlider"
-    )
-    .addEventListener(
-        "input",
-        updateSliderLabels
-    );
-
-
-/* =========================================================
-   UPLOAD WALLPAPER
-========================================================= */
-
-document
-    .getElementById(
-        "uploadWallpaperButton"
-    )
-    .addEventListener(
-        "click",
-        () =>
-            document
-                .getElementById(
-                    "wallpaperFile"
-                )
-                .click()
-    );
-
-
-document
-    .getElementById(
-        "wallpaperFile"
-    )
-    .addEventListener(
-        "change",
-        async event => {
-
-            const file =
-                event.target.files[0];
-
-
-            if (
-                !file
-            ) {
-
-                return;
-
-            }
-
-
-            if (
-                !file.type.startsWith(
-                    "image/"
-                )
-            ) {
-
-                showToast(
-                    "Please select an image."
-                );
-
-                return;
-
-            }
-
-
-            try {
-
-                await saveWallpaper(
-                    file
-                );
-
-
-                settings.wallpaperUrl =
-                    "";
-
-
-                saveSettings();
-
-
-                const url =
-                    URL.createObjectURL(
-                        file
-                    );
-
-
-                wallpaper.style.backgroundImage =
-                    `url("${url}")`;
-
-
-                wallpaper.classList.add(
-                    "has-image"
-                );
-
-
-                showToast(
-                    "Wallpaper updated"
-                );
-
-            } catch {
-
-                showToast(
-                    "Could not save wallpaper"
-                );
-
-            }
-
-        }
-    );
-
-
-/* =========================================================
-   WALLPAPER URL
-========================================================= */
-
-document
-    .getElementById(
-        "wallpaperUrl"
-    )
-    .addEventListener(
-        "change",
-        event => {
-
-            const url =
-                event.target.value.trim();
-
-
-            if (
-                !url
-            ) {
-
-                return;
-
-            }
-
-
-            try {
-
-                new URL(
-                    url
-                );
-
-            } catch {
-
-                showToast(
-                    "Invalid wallpaper URL"
-                );
-
-                return;
-
-            }
-
-
-            settings.wallpaperUrl =
-                url;
-
-
-            wallpaper.style.backgroundImage =
-                `url("${url}")`;
-
-
-            wallpaper.classList.add(
-                "has-image"
-            );
-
-        }
-    );
-
-
-/* =========================================================
-   REMOVE WALLPAPER
-========================================================= */
-
-document
-    .getElementById(
-        "removeWallpaperButton"
-    )
-    .addEventListener(
-        "click",
-        async () => {
-
-            await deleteWallpaper();
-
-
-            settings.wallpaperUrl =
-                "";
-
-
-            wallpaper.style.backgroundImage =
-                "";
-
-
-            wallpaper.classList.remove(
-                "has-image"
-            );
-
-
-            saveSettings();
-
-
-            showToast(
-                "Wallpaper removed"
-            );
-
-        }
-    );
-
-
-/* =========================================================
-   SAVE CUSTOMIZATION
-========================================================= */
-
-document
-    .getElementById(
-        "saveCustomizeButton"
-    )
-    .addEventListener(
-        "click",
-        () => {
-
-            settings.greeting =
-                document
-                    .getElementById(
-                        "greetingInput"
-                    )
-                    .value
-                    .trim();
-
-
-            settings.wallpaperUrl =
-                document
-                    .getElementById(
-                        "wallpaperUrl"
-                    )
-                    .value
-                    .trim();
-
-
-            settings.blur =
-                Number(
-                    document
-                        .getElementById(
-                            "blurSlider"
-                        )
-                        .value
-                );
-
-
-            settings.dim =
-                Number(
-                    document
-                        .getElementById(
-                            "dimSlider"
-                        )
-                        .value
-                );
-
-
-            greeting.textContent =
-                settings.greeting;
-
-
-            saveSettings();
-
-            applyWallpaperStyle();
-
-            customizeModal.classList.remove(
-                "active"
-            );
-
-            showToast(
-                "Customization saved"
-            );
-
-        }
-    );
-
-
-document
-    .getElementById(
-        "syncSettingsButton"
-    )
-    .addEventListener(
-        "click",
-        () => {
-            openGistSettingsModal();
-        }
-    );
-
-
-document
-    .getElementById(
-        "closeGistSettingsModal"
-    )
-    .addEventListener(
-        "click",
-        () => {
-            closeGistSettingsModal();
-        }
-    );
-
-
-document
-    .getElementById(
-        "gistSettingsForm"
-    )
-    .addEventListener(
-        "submit",
-        event => {
-            event.preventDefault();
-            saveGistCredentials();
-        }
-    );
-
-
-document
-    .getElementById(
-        "clearGistCredentialsButton"
-    )
-    .addEventListener(
-        "click",
-        () => {
-            clearGistCredentials();
-        }
-    );
-
-
-/* =========================================================
-   INITIALIZE WALLPAPER
-========================================================= */
-
-greeting.textContent =
-    settings.greeting;
-
-applyWallpaperStyle();
-
-loadSavedWallpaper();
-
-loadBookmarksFromGist();
-
-
-/* =========================================================
-   CLOSE MODALS ON BACKDROP
-========================================================= */
-
-[
-    appModal,
-    customizeModal,
-    syncSettingsModal
-].forEach(
-    modal => {
-
-        modal.addEventListener(
-            "click",
-            event => {
-
-                if (
-                    event.target ===
-                    modal
-                ) {
-
-                    modal.classList.remove(
-                        "active"
-                    );
-
-                }
-
-            }
-        );
-
-    }
-);
-
-
-/* =========================================================
-   KEYBOARD
-========================================================= */
-
-document.addEventListener(
-    "keydown",
-    event => {
-
-        if (
-            event.key ===
-            "Escape"
-        ) {
-
-            appModal.classList.remove(
-                "active"
-            );
-
-            customizeModal.classList.remove(
-                "active"
-            );
-
-            document
-                .getElementById(
-                    "themeMenu"
-                )
-                .classList.remove(
-                    "open"
-                );
-
-        }
-
-
-        if (
-            event.key === "/"
-            &&
-            document.activeElement.tagName !==
-            "INPUT"
-        ) {
-
-            event.preventDefault();
-
-            searchInput.focus();
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   SYSTEM THEME CHANGES
-========================================================= */
-
-window
-    .matchMedia(
-        "(prefers-color-scheme: dark)"
-    )
-    .addEventListener(
-        "change",
-        () => {
-
-            if (
-                (
-                    localStorage.getItem(
-                        THEME_KEY
-                    ) || "system"
-                ) === "system"
-            ) {
-
-                applyTheme(
-                    "system"
-                );
-
-            }
-
-        }
-    );
-
-
-/* =========================================================
-   TOAST
-========================================================= */
-
-let toastTimer;
-
-
-function showToast(
-    message
-) {
-
-    toast.textContent =
-        message;
-
-    toast.classList.add(
-        "show"
-    );
-
-
-    clearTimeout(
-        toastTimer
-    );
-
-
-    toastTimer =
-        setTimeout(
-            () => {
-
-                toast.classList.remove(
-                    "show"
-                );
-
-            },
-            2200
-        );
-
-}
-
-
-/* =========================================================
-   INITIAL RENDER
-========================================================= */
-
-renderApps();
-
-</script>
-
-</body>
-</html>
+function isRawSvg(value) {
+    return /^
