@@ -2558,6 +2558,16 @@ const gistModalError =
    LOCAL STORAGE
 ========================================================= */
 
+function normalizeAppData(app) {
+    return {
+        id: app.id || crypto.randomUUID(),
+        name: app.name || "",
+        url: app.url || "",
+        customIcon: app.customIcon || "",
+        iconColor: app.iconColor || "#007aff"
+    };
+}
+
 function loadApps() {
 
     try {
@@ -2569,7 +2579,7 @@ function loadApps() {
 
         if (!saved) {
 
-            return defaultApps;
+            return defaultApps.map(normalizeAppData);
 
         }
 
@@ -2577,12 +2587,12 @@ function loadApps() {
             JSON.parse(saved);
 
         return Array.isArray(parsed)
-            ? parsed
-            : defaultApps;
+            ? parsed.map(normalizeAppData)
+            : defaultApps.map(normalizeAppData);
 
     } catch {
 
-        return defaultApps;
+        return defaultApps.map(normalizeAppData);
 
     }
 
@@ -2671,7 +2681,7 @@ async function loadBookmarksFromGist() {
         }
 
         if (Array.isArray(remoteApps)) {
-            apps = remoteApps;
+            apps = remoteApps.map(normalizeAppData);
             saveApps(false);
             renderApps();
             updateSyncStatus('Synced');
